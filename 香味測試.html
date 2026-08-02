@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>隨身草本調香 ｜ 尋找你的專屬氣味能量</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* 預設主題：中央純白漸變至極淺灰米 */
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #FFFFFF 0%, #F7F8F9 100%);
+            --card-bg: #FFFFFF;
+            --primary: #9BB098;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --border-color: #F0ECE6;
+            --accent: #829880;
+            --shadow: 0 12px 32px rgba(0, 0, 0, 0.03);
+            --btn-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        /* 選項 A：極淺櫻花粉漸層 */
+        body.theme-A {
+            --bg-gradient: radial-gradient(circle at center, #FFFFFF 0%, #FDF4F5 100%);
+            --primary: #EAB2B5;
+            --accent: #C87A80;
+            --border-color: #FCE8EA;
+            --shadow: 0 12px 32px rgba(224, 155, 159, 0.08);
+        }
+
+        /* 選項 B：極淺天晴藍漸層 */
+        body.theme-B {
+            --bg-gradient: radial-gradient(circle at center, #FFFFFF 0%, #F4F8FA 100%);
+            --primary: #9EC0CE;
+            --accent: #5F899B;
+            --border-color: #E2ECF1;
+            --shadow: 0 12px 32px rgba(129, 168, 184, 0.08);
+        }
+
+        /* 選項 C：極淺薄荷綠漸層 */
+        body.theme-C {
+            --bg-gradient: radial-gradient(circle at center, #FFFFFF 0%, #F3F8F4 100%);
+            --primary: #A8C9AF;
+            --accent: #6C9B76;
+            --border-color: #E2EFE4;
+            --shadow: 0 12px 32px rgba(142, 184, 151, 0.08);
+        }
+
+        /* 選項 D：極淺薰衣紫漸層 */
+        body.theme-D {
+            --bg-gradient: radial-gradient(circle at center, #FFFFFF 0%, #F7F4F9 100%);
+            --primary: #C9B5D1;
+            --accent: #91759B;
+            --border-color: #EFE6F3;
+            --shadow: 0 12px 32px rgba(177, 155, 185, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: 'Noto Sans TC', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100dvh; /* 自動適配手機瀏覽器動態高度 */
+            padding: 24px 16px;
+            transition: background 0.6s ease;
+        }
+
+        /* 電腦端卡片樣式 */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            border-radius: 28px;
+            padding: 40px 32px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            transition: all 0.5s ease;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.8rem;
+            color: var(--text-main);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-sub);
+            font-size: 0.92rem;
+            letter-spacing: 1px;
+        }
+
+        /* 進度條與頂部列 */
+        .progress-container {
+            margin-bottom: 22px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            height: 28px;
+        }
+
+        .prev-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent);
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 20px;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .prev-btn:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .prev-btn.hidden {
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .progress-text {
+            font-size: 0.85rem;
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 14.2%;
+            transition: width 0.4s ease, background-color 0.5s ease;
+        }
+
+        /* 題目卡片動畫 */
+        .question-card {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        .question-card h2 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.55;
+            color: var(--text-main);
+        }
+
+        .options-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 輕柔空氣感按鈕 */
+        .option-btn {
+            background: var(--btn-bg);
+            border: 1px solid var(--border-color);
+            padding: 16px 20px;
+            border-radius: 18px;
+            text-align: left;
+            font-size: 0.96rem;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            line-height: 1.5;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.015);
+        }
+
+        /* 懸浮馬卡龍色調 */
+        .option-btn[data-type="A"]:hover, .option-btn[data-type="A"]:active {
+            border-color: #F7D4D6;
+            background: #FDF0F1;
+            color: #8C4347;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(224, 155, 159, 0.12);
+        }
+        .option-btn[data-type="B"]:hover, .option-btn[data-type="B"]:active {
+            border-color: #D2E4EC;
+            background: #EDF5F8;
+            color: #335969;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(129, 168, 184, 0.12);
+        }
+        .option-btn[data-type="C"]:hover, .option-btn[data-type="C"]:active {
+            border-color: #D4E8D7;
+            background: #EFF6F1;
+            color: #3B6143;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(142, 184, 151, 0.12);
+        }
+        .option-btn[data-type="D"]:hover, .option-btn[data-type="D"]:active {
+            border-color: #E6D8ED;
+            background: #F5EEF8;
+            color: #553A61;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(177, 155, 185, 0.12);
+        }
+        .option-btn[data-type="neutral"]:hover, .option-btn[data-type="neutral"]:active {
+            border-color: var(--primary);
+            background: #FAF8F5;
+            color: var(--text-main);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        /* 結果展示頁 */
+        .result-card {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        .result-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--accent);
+            border: 1px solid var(--border-color);
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+            transition: all 0.5s ease;
+        }
+
+        .result-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.9rem;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .user-color-pref {
+            font-size: 0.88rem;
+            color: var(--text-sub);
+            margin-bottom: 14px;
+        }
+
+        .result-desc {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            margin-bottom: 22px;
+            line-height: 1.6;
+        }
+
+        .recipe-box {
+            background: #FFFFFF;
+            border-radius: 18px;
+            padding: 20px;
+            text-align: left;
+            margin-bottom: 22px;
+            border: 1.5px dashed var(--primary);
+            transition: border-color 0.5s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.015);
+        }
+
+        .recipe-box h3 {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.05rem;
+            color: var(--accent);
+            margin-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            transition: color 0.5s ease;
+        }
+
+        .recipe-list {
+            list-style: none;
+        }
+
+        .recipe-list li {
+            padding: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.92rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 34px;
+            border-radius: 30px;
+            font-size: 0.98rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+        }
+
+        .restart-btn:hover {
+            opacity: 0.92;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.09);
+        }
+
+        /* 📱 手機端 (Mobile RWD) 專屬微調 */
+        @media (max-width: 480px) {
+            body {
+                padding: 16px 12px;
+            }
+
+            .container {
+                padding: 28px 20px;
+                border-radius: 22px;
+            }
+
+            .header h1 {
+                font-size: 1.55rem;
+            }
+
+            .header p {
+                font-size: 0.85rem;
+            }
+
+            .question-card h2 {
+                font-size: 1.1rem;
+                margin-bottom: 16px;
+            }
+
+            .option-btn {
+                padding: 14px 16px;
+                font-size: 0.92rem;
+                border-radius: 14px;
+            }
+
+            .result-title {
+                font-size: 1.6rem;
+            }
+
+            .recipe-box {
+                padding: 16px;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="theme-default">
+
+<div class="container">
+    <div class="header">
+        <h1>尋找你的隨身香氣</h1>
+        <p>烏龍茶韻 ‧ 漢方草本客製調配</p>
+    </div>
+
+    <!-- 測驗內容區塊 -->
+    <div id="quiz-box">
+        <div class="progress-container">
+            <div class="progress-header">
+                <button id="prev-btn" class="prev-btn hidden" onclick="prevQuestion()">← 上一題</button>
+                <span class="progress-text" id="progress-text">1 / 7</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+        </div>
+        <div class="question-card" id="question-card">
+            <h2 id="question-text">載入中...</h2>
+            <div class="options-group" id="options-container"></div>
+        </div>
+    </div>
+
+    <!-- 測驗結果區塊 -->
+    <div class="result-card" id="result-box">
+        <span class="result-tag" id="result-tag">專屬建議</span>
+        <h2 class="result-title" id="result-title">配方名稱</h2>
+        <div class="user-color-pref" id="user-color-pref">偏好視覺色調：--</div>
+        <p class="result-desc" id="result-desc">配方描述...</p>
+        
+        <div class="recipe-box">
+            <h3>🍵 專屬五味漢方抓藥配方 (共 20g 隨身包)</h3>
+            <ul class="recipe-list" id="recipe-items"></ul>
+        </div>
+
+        <button class="restart-btn" onclick="restartQuiz()">重新測驗</button>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            q: "1. 結束忙碌的一天後，你最希望進行哪種「心靈充電」？",
+            options: [
+                { text: "關掉燈光，在安靜無聲的房間裡安穩地躺著放空。", type: "A" },
+                { text: "洗個極其爽快的熱水澡，把整天的悶熱與煩躁沖洗乾淨。", type: "B" },
+                { text: "窩在沙發上蓋著軟毯，喝一杯溫熱微甜的飲品。", type: "C" },
+                { text: "點上一盞微光，靜靜閱讀或整理空間，給自己一個結界。", type: "D" }
+            ]
+        },
+        {
+            q: "2. 想像伸手觸摸一塊布料，哪種觸感最能撫慰你現在的狀態？",
+            options: [
+                { text: "柔軟輕盈的絲絨：被溫柔包覆，感到無比安心。", type: "A" },
+                { text: "透氣乾爽的麻布：微風能穿透過去，極度清爽。", type: "B" },
+                { text: "厚實綿密的羊毛：帶有體溫般的暖意與親和力。", type: "C" },
+                { text: "平滑紮實的棉布：俐落乾淨，帶來有條不紊的秩序感。", type: "D" }
+            ]
+        },
+        {
+            q: "3. 如果此刻能調控你周圍的理想天氣，你希望是？",
+            options: [
+                { text: "微陰無雨的寧靜深夜：世界都睡著了，只屬於你自己。", type: "A" },
+                { text: "雨後初晴的藍天：微風吹過，空氣乾淨透亮。", type: "B" },
+                { text: "秋日午後的溫暖陽光：微風不燥，全身暖洋洋的。", type: "C" },
+                { text: "高山雲霧繚繞的清晨：空氣清涼，每口呼吸都精神一振。", type: "D" }
+            ]
+        },
+        {
+            q: "4. 如果能在身邊帶上一件靜靜陪伴你的隨身小物，你希望它帶來什麼力量？",
+            options: [
+                { text: "無聲的安撫：在焦慮不安時，悄悄撫平緊繃的神經。", type: "A" },
+                { text: "瞬間的舒展：在昏沉悶熱時，為生活注入一股清涼生機。", type: "B" },
+                { text: "溫馨的抱撫：像陽光照耀般，帶來充滿溫度的包容感。", type: "C" },
+                { text: "安心的結界：出門在外時，為你阻擋外界的混濁與雜質。", type: "D" }
+            ]
+        },
+        {
+            q: "5. 當你感覺體力與精力幾乎耗盡時，你最直覺會想做的第一個動作是？",
+            options: [
+                { text: "什麼都不想做，立刻躺平、閉上眼睛，讓腦袋完全停止運轉。", type: "A" },
+                { text: "找朋友大吐苦水、運動發汗，或是大喊一聲把累積的悶氣吐出來。", type: "B" },
+                { text: "吃一頓有溫度的美食、喝杯熱飲，用食物與熱量好好犒賞自己。", type: "C" },
+                { text: "洗個熱水澡、洗衣服或整理房間，把身上的殘留異味與穢氣洗掉。", type: "D" }
+            ]
+        },
+        {
+            q: "6. 閉上眼，你現在最想待在哪個理想空間裡度過週末？",
+            options: [
+                { text: "深山裡的獨立木屋：遠離人群，享受安靜與沉睡。", type: "A" },
+                { text: "海風吹拂的海岸廊道：大口呼吸，把煩惱甩在身後。", type: "B" },
+                { text: "充滿溫暖香氣的老宅茶館：悠閒品茶，享受愜意光景。", type: "C" },
+                { text: "高海拔的高山森林步道：呼吸純淨空氣，重整專注狀態。", type: "D" }
+            ]
+        },
+        {
+            q: "7. 選擇一個你平時最喜歡的色彩：",
+            isColorPref: true,
+            options: [
+                { text: "酒紅", colorName: "酒紅", type: "neutral" },
+                { text: "正紅", colorName: "正紅", type: "neutral" },
+                { text: "粉紅", colorName: "粉紅", type: "neutral" },
+                { text: "淺藍", colorName: "淺藍", type: "neutral" },
+                { text: "藏藍", colorName: "藏藍", type: "neutral" },
+                { text: "淺綠", colorName: "淺綠", type: "neutral" },
+                { text: "淺米", colorName: "淺米", type: "neutral" }
+            ]
+        }
+    ];
+
+    const formulaMatrix = {
+        "AA": { title: "睡在烏龍茶裡的雲", tag: "微甜夢境 ‧ 極致沉靜", theme: "theme-A", desc: "專為心思多、很難徹底卸下心防的你調配。烏龍茶的烘焙氣息與薰衣草、溫柔雙花交織，像是一朵包覆著思緒的暖雲，伴你安心入眠。", ingredients: [{name:"烏龍茶葉",a:6},{name:"薰衣草",a:5},{name:"玫瑰花",a:4},{name:"乾燥桂花",a:3},{name:"艾草",a:2}] },
+        "BB": { title: "午後的風與野玫瑰", tag: "清爽透亮 ‧ 自由舒展", theme: "theme-B", desc: "獻給生活有些沉悶、急需一口乾淨呼吸的人。薄荷的透亮微涼交織高雅玫瑰，在烏龍茶底韻中徐徐展開，吹散所有壓抑與燥熱。", ingredients: [{name:"烏龍茶葉",a:6},{name:"玫瑰花",a:5},{name:"薄荷",a:4},{name:"薰衣草",a:3},{name:"艾草",a:2}] },
+        "CC": { title: "微醺暖陽與桂花茶", tag: "溫暖甜醇 ‧ 柔情包覆", theme: "theme-C", desc: "給習慣照顧別人、卻忘了好好滋養自己的你。醇厚烏龍茶葉與甘甜桂花是溫柔主調，伴隨丁香與玫瑰的綿密暖意，為生活注滿小太陽。", ingredients: [{name:"烏龍茶葉",a:6},{name:"乾燥桂花",a:5},{name:"玫瑰花",a:4},{name:"丁香",a:3},{name:"艾草",a:2}] },
+        "DD": { title: "山林深處的淨化結界", tag: "草本屏障 ‧ 清醒專注", theme: "theme-D", desc: "專為經常需要穿梭混濁環境、極需個人獨立氣場的人設計。艾草與薄荷的勁涼草本，在烏龍茶的定香下，為你築起一道安穩清爽的守護牆。", ingredients: [{name:"烏龍茶葉",a:5},{name:"艾草",a:5},{name:"薄荷",a:4},{name:"丁香",a:3},{name:"薰衣草",a:3}] },
+        
+        "AB": { title: "薄荷花海與晚安曲", tag: "平息嘈雜 ‧ 輕盈舒壓", theme: "theme-A", desc: "結合了安神沉靜與解悶舒展的需求。薰衣草撫平了過度運轉的心神，微涼薄荷與玫瑰則悄悄帶走累積一整天的悶熱。", ingredients: [{name:"烏龍茶葉",a:5},{name:"薰衣草",a:4},{name:"薄荷",a:4},{name:"玫瑰花",a:4},{name:"乾燥桂花",a:3}] },
+        "AC": { title: "冬日木屋的甜夢", tag: "靜謐包覆 ‧ 滋養安感", theme: "theme-A", desc: "既需要深沉的休息，又渴望心靈被溫柔捧著。桂花的甘甜與薰衣草的平靜完美相融，像是圍繞著篝火的恬淡夢境。", ingredients: [{name:"烏龍茶葉",a:5},{name:"薰衣草",a:4},{name:"乾燥桂花",a:4},{name:"玫瑰花",a:4},{name:"艾草",a:3}] },
+        "AD": { title: "禪院微光與草本香", tag: "深層沉定 ‧ 隨身結界", theme: "theme-A", desc: "當心裡有些飄搖無依時，這款香氣能帶你回到當下。艾草與白芷的踏實感，融合薰衣草的平靜，帶來禪房般的安全感。", ingredients: [{name:"烏龍茶葉",a:5},{name:"薰衣草",a:4},{name:"艾草",a:4},{name:"丁香",a:4},{name:"薄荷",a:3}] },
+        
+        "BA": { title: "星空下的清涼花茶", tag: "帶走心煩 ‧ 微涼沉靜", theme: "theme-B", desc: "以薄荷與玫瑰的鮮活爽朗為主，揉合薰衣草的平靜力量，讓你在悶熱煩燥的快節奏中，瞬間找回從容與定力。", ingredients: [{name:"烏龍茶葉",a:5},{name:"薄荷",a:5},{name:"玫瑰花",a:4},{name:"薰衣草",a:4},{name:"乾燥桂花",a:2}] },
+        "BC": { title: "日光微風桂花特調", tag: "甘甜活水 ‧ 解壓理氣", theme: "theme-B", desc: "薄荷的冰爽穿透桂花的蜜甜，宛如一杯透心涼的桂花高山茶，既能為胸口解悶，又能帶來暖心的親和力。", ingredients: [{name:"烏龍茶葉",a:5},{name:"薄荷",a:5},{name:"乾燥桂花",a:4},{name:"玫瑰花",a:3},{name:"丁香",a:3}] },
+        "BD": { title: "海岸微風與綠草地", tag: "極致雙涼 ‧ 去除昏沉", theme: "theme-B", desc: "薄荷與艾草的強強聯手！這是一款最具活力的空氣淨化器，能瞬間擊退午後昏沉，帶走環境周圍的雜質感。", ingredients: [{name:"烏龍茶葉",a:5},{name:"薄荷",a:5},{name:"艾草",a:4},{name:"丁香",a:3},{name:"薰衣草",a:3}] },
+
+        "CA": { title: "花園下午茶的偷閒", tag: "柔和暖意 ‧ 夢幻陪伴", theme: "theme-C", desc: "以桂花與玫瑰的甘甜質感為基底，佐以薰衣草的撫慰力量，就像給勞累的身心覆上一層柔軟微甜的羽絨被。", ingredients: [{name:"烏龍茶葉",a:5},{name:"乾燥桂花",a:5},{name:"玫瑰花",a:4},{name:"薰衣草",a:4},{name:"丁香",a:2}] },
+        "CB": { title: "冰鎮桂花烏龍茶", tag: "溫潤甜美 ‧ 涼爽舒展", theme: "theme-C", desc: "溫暖的桂花與陳皮底韻中，驚喜地透出一絲薄荷微涼，完美調和了「溫滋養」與「涼解鬱」兩種生活渴望。", ingredients: [{name:"烏龍茶葉",a:5},{name:"乾燥桂花",a:5},{name:"玫瑰花",a:4},{name:"薄荷",a:3},{name:"艾草",a:3}] },
+        "CD": { title: "古鎮老宅的艾草香", tag: "踏實暖意 ‧ 避穢防護", theme: "theme-C", desc: "融合了桂花的親切暖意與艾草、丁香的堅固避穢能量，適合體質怕冷、卻又常需要出入熱鬧人群的你隨身守護。", ingredients: [{name:"烏龍茶葉",a:5},{name:"乾燥桂花",a:4},{name:"艾草",a:4},{name:"丁香",a:4},{name:"薄荷",a:3}] },
+
+        "DA": { title: "古樹林間的安眠曲", tag: "淨化防衛 ‧ 平靜撫思", theme: "theme-D", desc: "以艾草草本為防護核心，融入薰衣草的平靜，在提供隨身乾淨氣場的同時，也輕柔抚平你過度運轉的思緒。", ingredients: [{name:"烏龍茶葉",a:5},{name:"艾草",a:5},{name:"薰衣草",a:4},{name:"玫瑰花",a:3},{name:"丁香",a:3}] },
+        "DB": { title: "晨露森林的醒腦針", tag: "透亮直通 ‧ 淨化屏障", theme: "theme-D", desc: "艾草、薄荷與丁香交織出極具穿透力的清勁香氣，一吸一呼間通暢鼻腔、甦醒大腦，是通勤與戶外的最佳能量屏障。", ingredients: [{name:"烏龍茶葉",a:5},{name:"艾草",a:4},{name:"薄荷",a:5},{name:"丁香",a:3},{name:"薰衣草",a:3}] },
+        "DC": { title: "暖草庇護所", tag: "安全結界 ‧ 溫馨自然", theme: "theme-D", desc: "沉穩堅固的艾草草本防護中，透著桂花與玫瑰的親切甜美，少了一份嚴肅的藥草感，多了一份踏實的大自然微溫。", ingredients: [{name:"烏龍茶葉",a:5},{name:"艾草",a:4},{name:"乾燥桂花",a:4},{name:"玫瑰花",a:4},{name:"丁香",a:3}] }
+    };
+
+    let currentQ = 0;
+    let scores = { A: 0, B: 0, C: 0, D: 0 };
+    let selectedColor = "";
+    let userHistory = []; 
+
+    function loadQuestion() {
+        const qData = questions[currentQ];
+        
+        const card = document.getElementById("question-card");
+        card.style.animation = 'none';
+        card.offsetHeight;
+        card.style.animation = 'slideUp 0.4s ease forwards';
+
+        document.getElementById("question-text").innerText = qData.q;
+        
+        const optionsContainer = document.getElementById("options-container");
+        optionsContainer.innerHTML = "";
+
+        qData.options.forEach(opt => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.setAttribute("data-type", opt.type);
+            btn.innerText = opt.text;
+            btn.onclick = () => selectOption(opt);
+            optionsContainer.appendChild(btn);
+        });
+
+        const progressPercent = ((currentQ + 1) / questions.length) * 100;
+        document.getElementById("progress").style.width = progressPercent + "%";
+        document.getElementById("progress-text").innerText = `${currentQ + 1} / ${questions.length}`;
+
+        const prevBtn = document.getElementById("prev-btn");
+        if (currentQ > 0) {
+            prevBtn.classList.remove("hidden");
+        } else {
+            prevBtn.classList.add("hidden");
+        }
+    }
+
+    function selectOption(opt) {
+        userHistory.push(opt);
+
+        if (!opt.colorName) {
+            scores[opt.type]++;
+            document.body.className = `theme-${opt.type}`;
+        } else {
+            selectedColor = opt.colorName;
+        }
+
+        currentQ++;
+
+        if (currentQ < questions.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentQ > 0) {
+            currentQ--;
+            const lastOpt = userHistory.pop();
+            
+            if (lastOpt && !lastOpt.colorName) {
+                scores[lastOpt.type]--;
+            } else if (lastOpt && lastOpt.colorName) {
+                selectedColor = "";
+            }
+
+            let prevType = "default";
+            for (let i = userHistory.length - 1; i >= 0; i--) {
+                if (!userHistory[i].colorName) {
+                    prevType = userHistory[i].type;
+                    break;
+                }
+            }
+            document.body.className = (prevType === "default") ? "theme-default" : `theme-${prevType}`;
+
+            loadQuestion();
+        }
+    }
+
+    function showResult() {
+        document.getElementById("quiz-box").style.display = "none";
+        document.getElementById("result-box").style.display = "block";
+
+        let sortedTypes = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
+        let primary = sortedTypes[0];
+        let secondary = sortedTypes[1];
+
+        let comboKey = (scores[primary] - scores[secondary] >= 2) ? (primary + primary) : (primary + secondary);
+        
+        const resultData = formulaMatrix[comboKey] || formulaMatrix["AA"];
+        
+        document.body.className = resultData.theme;
+
+        document.getElementById("result-tag").innerText = resultData.tag;
+        document.getElementById("result-title").innerText = resultData.title;
+        document.getElementById("user-color-pref").innerText = selectedColor ? `偏好視覺色調：${selectedColor}` : "";
+        document.getElementById("result-desc").innerText = resultData.desc;
+
+        const recipeList = document.getElementById("recipe-items");
+        recipeList.innerHTML = "";
+        resultData.ingredients.forEach(item => {
+            const li = document.createElement("li");
+            const percent = Math.round((item.a / 20) * 100);
+            li.innerHTML = `<span>${item.name}</span><strong>${item.a} 克 (${percent}%)</strong>`;
+            recipeList.appendChild(li);
+        });
+    }
+
+    function restartQuiz() {
+        currentQ = 0;
+        scores = { A: 0, B: 0, C: 0, D: 0 };
+        selectedColor = "";
+        userHistory = [];
+        document.body.className = "theme-default";
+        document.getElementById("quiz-box").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+</html>
